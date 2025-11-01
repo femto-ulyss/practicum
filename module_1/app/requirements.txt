@@ -1,0 +1,5 @@
+orjson
+confluent-kafka[avro]
+referencing
+jsonschema
+dataclasses-avroschema
