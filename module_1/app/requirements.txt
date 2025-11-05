@@ -1,5 +1,5 @@
-orjson
-confluent-kafka[avro]
-referencing
-jsonschema
-dataclasses-avroschema
+orjson==3.11.4
+confluent-kafka[avro]==2.12.1
+referencing==0.37.0
+jsonschema==4.25.1
+dataclasses-avroschema==0.66.0
