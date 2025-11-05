@@ -2,6 +2,7 @@
 
 import logging
 import signal
+import time
 
 from confluent_kafka import Consumer, KafkaError, KafkaException, Message  # type: ignore
 from dataclasses_avroschema import AvroModel
@@ -245,6 +246,17 @@ class BatchConsumerApp(SingleMessageConsumerApp):
     # Константа размера батча
     BATCH_SIZE: int = 10
 
+    def __init__(self, config) -> None:
+        """Создает новый экземпляр BatchConsumerApp.
+
+        Parameters
+        ----------
+        config : dict[str, str  |  bool]
+            Конфигурация kafka-consumer в виде dict'а
+        """
+        self.batch_timeout: float = float(config.pop("batch_time_out"))
+        super().__init__(config)
+
     def poll_messages(self, timeout=DEFAULT_POLL_TIMEOUT) -> list[Message]:
         """Опрашивает новые сообщения из Kafka пока не будет получено кол-во сообщений
         равное self.BATCH_SIZE, после чего коммитит смещение и возвращает батч сообщений
@@ -268,9 +280,22 @@ class BatchConsumerApp(SingleMessageConsumerApp):
 
         # Определяем список который будет батч сообщений
         msg_list: list[Message] = []
+        start_time: float = time.time()
 
         # Запускаем внутренний цикл для опроса сообщений
         while self.running:
+
+            # Дотигнет таймаут батча - пишем warning в лог
+            if (time.time() - start_time) >= self.batch_timeout:
+                self.logger.warning("Batch timeout reached.")
+
+                # Если за batch_timeout не полученно сообщений - пишем warning в лог
+                if len(msg_list) == 0:
+                    self.logger.warning("No messages consumed before `batch_timeout`.")
+                
+                # Прерываем обработку батча
+                break
+
             try:
                 # Получаем сообщение
                 msg = self.consumer.poll(timeout)

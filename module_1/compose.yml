@@ -97,6 +97,7 @@ services:
       KAFKA_CONSUMER_ENABLE_AUTO_COMMIT: true
       KAFKA_CONSUMER_MAX_POLL_INTERVAL_MS: 300000
       KAFKA_CONSUMER_SESSION_TIMEOUT_MS: 10000
+      KAFKA_CONSUMER_BATCH_TIMEOUT: 10
     deploy:
       mode: replicated
       replicas: 6

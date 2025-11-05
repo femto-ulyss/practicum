@@ -42,6 +42,8 @@ def consumer(group_id: str, subscribe: str, batch: bool):
         "max.poll.interval.ms": os.environ["KAFKA_CONSUMER_MAX_POLL_INTERVAL_MS"],
         # Таймаут сесси, при его достижении worker убирается из группы consumer'ов и запускает ребалансировка, получем из env контейнера
         "session.timeout.ms": os.environ["KAFKA_CONSUMER_SESSION_TIMEOUT_MS"],
+        # Таймаут батча, при его достижении, если получено хотя бы 1 сообщение, возвращает обработанный батч
+        "batch_time_out": os.environ["KAFKA_CONSUMER_BATCH_TIMEOUT"]
     }
 
     # Выбираем тип обработки в зависимости от параметра batch
