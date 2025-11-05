@@ -55,8 +55,8 @@ docker exec -it module_1-app-2 python /app/cli.py consumer --subscribe test_topi
 ```
 4. Запустите `BatchConsumerApp`:
 ```bash
-docker exec -it module_1-app-1 python /app/cli.py consumer --subscribe test_topic --group_id batch_consumer
-docker exec -it module_1-app-2 python /app/cli.py consumer --subscribe test_topic --group_id batch_consumer
+docker exec -it module_1-app-1 python /app/cli.py consumer --subscribe test_topic --group_id batch_consumer --batch
+docker exec -it module_1-app-2 python /app/cli.py consumer --subscribe test_topic --group_id batch_consumer --batch
 ```
 5. Для отправки простых сообщений запустите sh-скрит `module_1.test.produce_simple.sh`:
 ```bash
