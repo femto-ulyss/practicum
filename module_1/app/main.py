@@ -108,7 +108,11 @@ def producer(topic: str, key: str | None, value: str, dataclass: str | None) -> 
     }
 
     # Заводим переменную для хранения заголовков
-    headers: dict[str, str | None] = {"dataclass": dataclass}
+    headers: dict[str, str | None] = {}
+
+    # Записываем в заголовки dataclass если он передан
+    if dataclass:
+        headers["dataclass"] = dataclass
 
     # Создаем приложение producer
     producer_app: ProducerApp = ProducerApp(config)
