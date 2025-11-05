@@ -103,6 +103,8 @@ def producer(topic: str, key: str | None, value: str, dataclass: str | None) -> 
         "acks": os.environ["KAKFA_PRODUCER_ACKS"],
         # Сколько раз producer будет пытаться отправить сообщение повторно в случае ошибки, получем из env контейнера
         "retries": os.environ["KAFKA_PRODUCER_RETRIES"],
+        # Максимально кол-во неподтвержденных сообщение в рамках 1 соединения 
+        "max.in.flight.requests.per.connection": os.environ["KAFKA_PRODUCER_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION"]
     }
 
     # Заводим переменную для хранения заголовков
