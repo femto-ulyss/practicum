@@ -1,16 +1,16 @@
 """Классы kafka-producer'а."""
 
+import json
 import logging
 
-from confluent_kafka import Producer, Message, KafkaError  # type: ignore
-from serde.messages import BaseMessage  # type: ignore
+from confluent_kafka import KafkaError, Message, Producer  # type: ignore
 from serde import messages  # type: ignore
-import json
+from serde.messages import BaseMessage  # type: ignore
 
 
 class ProducerApp:
     """Kafka-producer отправляющий сообщения в Kafka."""
-    
+
     def __init__(self, config: dict[str, str | int]) -> None:
         """Создает новый экземпляр ProducerApp.
 
@@ -19,7 +19,7 @@ class ProducerApp:
         config : dict[str, str  |  int]
             Конфигурация kafka-producer'а в виде dict'а
         """
-        
+
         # Конфигурация consumer'а
         self.producer: Producer = Producer(config)
 
@@ -32,14 +32,14 @@ class ProducerApp:
 
     def delivery_report(self, err: KafkaError, msg: Message) -> None:
         """Callback-функция отчета о доставкею
-        
+
         Parameters:
         err: KafkaError
             Ошибка отправки сообщения
         msg: Message
             Сообщение которое было отправлено в Kafka
         """
-        
+
         # Если возникла ошибка сообщения пишем в лог
         if err is not None:
             self.logger.error(f"Message delivery fauled: {err}")

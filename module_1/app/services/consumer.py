@@ -4,10 +4,9 @@ import logging
 import signal
 import time
 
+import serde.messages as messages  # type: ignore
 from confluent_kafka import Consumer, KafkaError, KafkaException, Message  # type: ignore
 from dataclasses_avroschema import AvroModel
-
-import serde.messages as messages  # type: ignore
 
 
 class SingleMessageConsumerApp:
@@ -284,7 +283,6 @@ class BatchConsumerApp(SingleMessageConsumerApp):
 
         # Запускаем внутренний цикл для опроса сообщений
         while self.running:
-
             # Дотигнет таймаут батча - пишем warning в лог
             if (time.time() - start_time) >= self.batch_timeout:
                 self.logger.warning("Batch timeout reached.")
@@ -292,7 +290,7 @@ class BatchConsumerApp(SingleMessageConsumerApp):
                 # Если за batch_timeout не полученно сообщений - пишем warning в лог
                 if len(msg_list) == 0:
                     self.logger.warning("No messages consumed before `batch_timeout`.")
-                
+
                 # Прерываем обработку батча
                 break
 
@@ -314,7 +312,7 @@ class BatchConsumerApp(SingleMessageConsumerApp):
                     # Райзми ошибку в виде KafkaException
                     else:
                         raise KafkaException(msg.error())
-                    
+
                 # Если сообщение не пустое добавляем его к батчу
                 else:
                     msg_list.append(msg)
@@ -326,7 +324,7 @@ class BatchConsumerApp(SingleMessageConsumerApp):
                         # возвращаем батч
                         return msg_list
 
-            # Если из Kafka пришла ошибка - пишем в лог и переходим 
+            # Если из Kafka пришла ошибка - пишем в лог и переходим
             # к следующей итерации
             except KafkaException as e:
                 self.logger.error(f"Error recived from Kafka: {e}")

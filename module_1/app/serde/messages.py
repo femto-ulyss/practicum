@@ -1,15 +1,15 @@
 """Сериализация / Десериализация с помощью dataclasses_avroschema."""
+
 from abc import abstractmethod
-from dataclasses_avroschema import AvroModel
 from dataclasses import dataclass
+
+from dataclasses_avroschema import AvroModel
 
 
 class BaseMessage(AvroModel):
-
     @property
     @abstractmethod
-    def partition_key(self) -> str:
-        ...
+    def partition_key(self) -> str: ...
 
 
 @dataclass
