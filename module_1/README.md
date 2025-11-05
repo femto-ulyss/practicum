@@ -60,11 +60,11 @@ docker exec -it module_1-app-2 python /app/cli.py consumer --subscribe test_topi
 ```
 5. Для отправки простых сообщений запустите sh-скрит `module_1.test.produce_simple.sh`:
 ```bash
-./module_1/test/produce_simple.sh
+./module_1/test/produce_simple.sh 29
 ```
 6. Для отправки сериализованных с помощью `dataclasses_avro.AvroModel` сообщений запутите sh-скрипт `module_1.test.produce_dataclass.sh`
 ```bash
-./module_1/test/produce_dataclass.sh
+./module_1/test/produce_dataclass.sh 38
 ```
 
 
