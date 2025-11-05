@@ -1,11 +1,19 @@
 """Сериализация / Десериализация с помощью dataclasses_avroschema."""
-
+from abc import abstractmethod
 from dataclasses_avroschema import AvroModel
 from dataclasses import dataclass
 
 
+class BaseMessage(AvroModel):
+
+    @property
+    @abstractmethod
+    def partition_key(self) -> str:
+        ...
+
+
 @dataclass
-class SKU(AvroModel):
+class SKU(BaseMessage):
     """Dataclass реализующий единицу складского учета
 
     Parameters
@@ -30,3 +38,7 @@ class SKU(AvroModel):
     is_limited: bool
     metadata: dict[str, str]
     tags: list[str] | None = None
+
+    @property
+    def partition_key(self) -> str:
+        return "sku_id"

@@ -3,7 +3,7 @@
 import logging
 
 from confluent_kafka import Producer, Message, KafkaError  # type: ignore
-from dataclasses_avroschema import AvroModel
+from serde.messages import BaseMessage  # type: ignore
 from serde import messages  # type: ignore
 import json
 
@@ -47,7 +47,9 @@ class ProducerApp:
         else:
             self.logger.info(f"Message delivered to {msg.topic()} [{msg.partition()}]")
 
-    def serialize_message(self, value: str, dataclass: str) -> bytes:
+    def serialize_message(
+        self, key: str | int | None, value: str, dataclass: str | None
+    ) -> tuple[bytes | None, bytes]:
         """Сериализует отправляемое сообщение как датакласс
 
         Parameters
@@ -62,27 +64,44 @@ class ProducerApp:
         bytes
             Значение сообщения серилизованное как датакласс или строка
         """
+        # Задаем переменную и заранее сереализуем в нее ключ сообщения
+        bytes_key: bytes | None = None
+        if key:
+            if isinstance(key, int):
+                bytes_key = str(key).encode("utf-8")
+            else:
+                bytes_key = key.encode("utf-8")
+
         # Заранее приведем значение сообщения в байты как строку
         bytes_value: bytes = value.encode("utf-8")
 
         # Попробуем сериализовать значение сообщения как dataclass
-        try:
-            message_class: AvroModel = getattr(messages, dataclass)(**json.loads(value))
-            bytes_value = message_class.serialize()
-        # Если возникает ValueError - пишем в лог, отправляем сообщение без сериализации
-        except ValueError as e:
-            self.logger.error(f"{e}. Got `{value}`. Proceed without serialization.")
-        # Если возникает AttributeEroor - пишем в лог, отправляем сообщение без сериализации
-        except AttributeError as e:
-            self.logger.error(f"{e}. Unkowns dataclass `{dataclass}`. Proceed without serialization.")
-        # При возникновении неизвестной ошибки - пишем в лог, отправляем сообщение без сериализации
-        except Exception as e:
-            self.logger.error(f"Unexpected serialization error: {e}")
+        if dataclass:
+            try:
+                message_class: BaseMessage = getattr(messages, dataclass)(**json.loads(value))
+                bytes_value = message_class.serialize()
 
-        return bytes_value
+                # Если ключ не передан используем свойство датакласса
+                if not key:
+                    bytes_key = str(getattr(message_class, message_class.partition_key)).encode(
+                        "utf-8"
+                    )
+            # Если возникает ValueError - пишем в лог, отправляем сообщение без сериализации
+            except ValueError as e:
+                self.logger.error(f"{e}. Got `{value}`. Proceed without serialization.")
+            # Если возникает AttributeEroor - пишем в лог, отправляем сообщение без сериализации
+            except AttributeError as e:
+                self.logger.error(
+                    f"{e}. Unkowns dataclass `{dataclass}`. Proceed without serialization."
+                )
+            # При возникновении неизвестной ошибки - пишем в лог, отправляем сообщение без сериализации
+            except Exception as e:
+                self.logger.error(f"Unexpected serialization error: {e}")
+
+        return bytes_key, bytes_value
 
     def produce(
-        self, topic: str, key: str | int | bytes | None, value: str, headers: dict[str, str]
+        self, topic: str, key: str | int | None, value: str, headers: dict[str, str]
     ) -> None:
         """Отправка сообщения в Kafka.
 
@@ -90,19 +109,25 @@ class ProducerApp:
         ----------
         topic : str
             Топик в который отправляется сообщение
-        key : str | int | bytes | None
-            Ключ сообщения в виде строки, числа, байт или пустое значение
+        key : str | int | None
+            Ключ сообщения в виде строки, числа или пустое значение
         value : bytes
             Значение сообщения в виде байтов
         headers : dict[str, str]
             Заголовки сообщения в виде dict'а
         """
 
-        if headers.get("dataclass", None) is not None:
-            bytes_value: bytes = self.serialize_message(value, headers["dataclass"])
+        # Задаем переменные и сохраняем в них сериализованные данные
+        bytes_key: bytes | None
+        bytes_value: bytes
+        bytes_key, bytes_value = self.serialize_message(key, value, headers.get("dataclass", None))
 
         self.producer.produce(
-            topic=topic, key=key, value=bytes_value, headers=headers, on_delivery=self.delivery_report
+            topic=topic,
+            key=bytes_key,
+            value=bytes_value,
+            headers=headers,
+            on_delivery=self.delivery_report,
         )
 
     def flush(self) -> None:
