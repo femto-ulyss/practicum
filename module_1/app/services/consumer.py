@@ -157,11 +157,11 @@ class SingleMessageConsumerApp:
         """
 
         # Приводим заголовки сообщения к dict'у
-        headers: dict[str, str] = {}
-        if msg.headers():
-            headers = self.get_schema_from_headers(msg.headers())
-
         try:
+            headers: dict[str, str] = {}
+            if msg.headers():
+                headers = self.get_schema_from_headers(msg.headers())
+
             # Десериализуем ключь при его наличии в строку
             key: str | None = msg.key().decode("utf-8") if msg.key() else None
             value: object
