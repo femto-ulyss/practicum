@@ -1,0 +1,18 @@
+{"topic": "blocked_users", "message": {"user": "user-1", "block": "user-x"}}
+{"topic": "blocked_users", "message": {"user": "user-1", "block": "user-y"}}
+{"topic": "blocked_users", "message": {"user": "user-1", "block": "user-z"}}
+{"topic": "blocked_users", "message": {"user": "user-2", "block": "user-y"}}
+{"topic": "blocked_words", "message": {"word": "fubar"}}
+{"topic": "blocked_words", "message": {"word": "buzzfuzz"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-2", "body": "Passing message from `user-1` to `user-2`"}}
+{"topic": "messages", "message": {"sender_id": "user-2", "reciver_id": "user-1", "body": "Passing message from `user-2` to `user-1`"}}
+{"topic": "messages", "message": {"sender_id": "user-x", "reciver_id": "user-1", "body": "Blocking message from `user-x` to `user-1`"}}
+{"topic": "messages", "message": {"sender_id": "user-y", "reciver_id": "user-1", "body": "Blocking message from `user-y` to `user-1`"}}
+{"topic": "messages", "message": {"sender_id": "user-z", "reciver_id": "user-1", "body": "Blocking message from `user-z` to `user-1`"}}
+{"topic": "messages", "message": {"sender_id": "user-y", "reciver_id": "user-2", "body": "Blocking message from `user-y` to `user-2`"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-x", "body": "Passing message from `user-1` to `user-x`"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-y", "body": "Passing message from `user-1` to `user-y`"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-z", "body": "Passing message from `user-1` to `user-z`"}}
+{"topic": "messages", "message": {"sender_id": "user-2", "reciver_id": "user-y", "body": "Passing message from `user-2` to `user-y`"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-2", "body": "Masking fubar and buzzfuzz, but passing fuzz buzz and fu bar"}}
+{"topic": "messages", "message": {"sender_id": "user-1", "reciver_id": "user-2", "body": "Censor ignoreing case FUbar, BuzzFuzz, FuBaR"}}
